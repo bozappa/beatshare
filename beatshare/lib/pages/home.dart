@@ -1,13 +1,17 @@
+import 'package:beatshare/pages/create_account.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:beatshare/pages/timeline.dart';
 import 'package:beatshare/pages/profile.dart';
 import 'package:beatshare/pages/search.dart';
 import 'package:beatshare/pages/upload.dart';
 import 'package:beatshare/pages/activity_feed.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+
 final GoogleSignIn googleSignIn = GoogleSignIn();
+final usersRef = Firestore.instance.collection('users');
+final DateTime timestamp = DateTime.now();
 
 class Home extends StatefulWidget {
   @override
@@ -21,32 +25,54 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    // Detects when user signed in
     super.initState();
     pageController = PageController();
+    // Detects when user signed in
     googleSignIn.onCurrentUserChanged.listen((account) {
       handleSignIn(account);
     }, onError: (err) {
       print('Error signing in: $err');
     });
     // Reauthenticate user when app is opened
-    googleSignIn.signInSilently(suppressErrors: false)
-      .then((account) {
-        handleSignIn(account);
-      }).catchError((err) {
-        print('Error signing in: $err');
-      });
+    googleSignIn.signInSilently(suppressErrors: false).then((account) {
+      handleSignIn(account);
+    }).catchError((err) {
+      print('Error signing in: $err');
+    });
   }
 
   handleSignIn(GoogleSignInAccount account) {
     if (account != null) {
-      print('User signed in!: $account');
+      createUserInFirestore();
       setState(() {
         isAuth = true;
       });
     } else {
       setState(() {
         isAuth = false;
+      });
+    }
+  }
+
+  createUserInFirestore() async {
+    // 1) check if user exists in users collection in database (according to their id)
+    final GoogleSignInAccount user = googleSignIn.currentUser;
+    final DocumentSnapshot doc = await usersRef.document(user.id).get();
+
+    if (!doc.exists) {
+      // 2) if the user doesn't exist, then we want to take them to the create account page
+      final username = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => CreateAccount()));
+
+      // 3) get username from create account, use it to make new user document in users collection
+      usersRef.document(user.id).setData({
+        "id": user.id,
+        "username": username,
+        "photoUrl": user.photoUrl,
+        "email": user.email,
+        "displayName": user.displayName,
+        "bio": "",
+        "timestamp": timestamp
       });
     }
   }
@@ -61,17 +87,16 @@ class _HomeState extends State<Home> {
     googleSignIn.signIn();
   }
 
-  logout () {
+  logout() {
     googleSignIn.signOut();
   }
 
   onPageChanged(int pageIndex) {
     setState(() {
-        this.pageIndex = pageIndex;
+      this.pageIndex = pageIndex;
     });
   }
 
-  // Transitions between pages instead of jumping using animatetopage
   onTap(int pageIndex) {
     pageController.animateToPage(
       pageIndex,
@@ -79,12 +104,16 @@ class _HomeState extends State<Home> {
       curve: Curves.easeInOut,
     );
   }
-  
+
   Scaffold buildAuthScreen() {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          Timeline(),
+          // Timeline(),
+          RaisedButton(
+            child: Text('Logout'),
+            onPressed: logout,
+          ),
           ActivityFeed(),
           Upload(),
           Search(),
@@ -126,7 +155,7 @@ class _HomeState extends State<Home> {
             end: Alignment.bottomLeft,
             colors: [
               Theme.of(context).accentColor,
-              Theme.of(context).primaryColor
+              Theme.of(context).primaryColor,
             ],
           ),
         ),
@@ -140,7 +169,7 @@ class _HomeState extends State<Home> {
               style: TextStyle(
                 fontFamily: "Signatra",
                 fontSize: 90.0,
-                color: Colors.white
+                color: Colors.white,
               ),
             ),
             GestureDetector(
@@ -150,12 +179,14 @@ class _HomeState extends State<Home> {
                 height: 60.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/google_signing_button.png'),
+                    image: AssetImage(
+                      'assets/images/google_signin_button.png',
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),

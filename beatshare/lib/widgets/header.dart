@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 AppBar header(context, {bool isAppTitle = false, String titleText}) {
   return AppBar(
     title: Text(
-      isAppTitle ? "FlutterShare" : titleText,
+      isAppTitle ? "BeatShare" : titleText,
       style: TextStyle(
         color: Colors.white,
         fontFamily: isAppTitle ? "Signatra" : "",
