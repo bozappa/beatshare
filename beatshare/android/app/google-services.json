@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1090238837743",
+    "firebase_url": "https://beatshare-66e9b.firebaseio.com",
+    "project_id": "beatshare-66e9b",
+    "storage_bucket": "beatshare-66e9b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1090238837743:android:1e7d6450b1c8589f387c1a",
+        "android_client_info": {
+          "package_name": "com.deanmulrooney.beatshare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1090238837743-kigpua1tsmqqs7o8ldvvqeoave3nmf39.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.deanmulrooney.beatshare",
+            "certificate_hash": "25020f6dda3a95ca281349c61f062c0da7358a3d"
+          }
+        },
+        {
+          "client_id": "1090238837743-ijie3q90m6sd74eemlgpdcljnb1377u4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVTgEWr9-xiLycvLZhV6TEbcENzYhZk-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1090238837743-ijie3q90m6sd74eemlgpdcljnb1377u4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1090238837743-ipkgqd52sfc9dho3q47of99mhco3snd4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.deanmulrooney.beatshare"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
