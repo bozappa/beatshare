@@ -7,8 +7,6 @@ import 'package:beatshare/pages/upload.dart';
 import 'package:beatshare/pages/activity_feed.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'activity_feed.dart';
-
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
 class Home extends StatefulWidget {
@@ -73,9 +71,12 @@ class _HomeState extends State<Home> {
     });
   }
 
+  // Transitions between pages instead of jumping using animatetopage
   onTap(int pageIndex) {
-    pageController.jumpToPage(
+    pageController.animateToPage(
       pageIndex,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
   
@@ -94,19 +95,21 @@ class _HomeState extends State<Home> {
         physics: NeverScrollableScrollPhysics(),
       ),
       bottomNavigationBar: CupertinoTabBar(
-        currentIndex: pageIndex,
-        onTap: onTap,
-        activeColor: Theme.of(context).primaryColor,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.whatshot),),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications_active),),
-          BottomNavigationBarItem(icon: Icon(Icons.photo_camera, size:
-          35.0,),),
-          BottomNavigationBarItem(icon: Icon(Icons.search),),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle),),
-          
-        ]
-      ),
+          currentIndex: pageIndex,
+          onTap: onTap,
+          activeColor: Theme.of(context).primaryColor,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.whatshot)),
+            BottomNavigationBarItem(icon: Icon(Icons.notifications_active)),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.photo_camera,
+                size: 35.0,
+              ),
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.search)),
+            BottomNavigationBarItem(icon: Icon(Icons.account_circle)),
+          ]),
     );
     // return RaisedButton(
     //   child: Text('Logout'),
@@ -132,7 +135,8 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text('BeatShare',
+            Text(
+              'BeatShare',
               style: TextStyle(
                 fontFamily: "Signatra",
                 fontSize: 90.0,
