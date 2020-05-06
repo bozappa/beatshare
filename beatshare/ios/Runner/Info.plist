@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>fluttershare</string>
+	<string>beatshare</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -25,7 +25,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ccom.googleusercontent.apps.1090238837743-ipkgqd52sfc9dho3q47of99mhco3snd4</string>
+				<string>com.googleusercontent.apps.1090238837743-ipkgqd52sfc9dho3q47of99mhco3snd4</string>
 			</array>
 		</dict>
 	</array>
