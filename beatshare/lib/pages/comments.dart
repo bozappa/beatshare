@@ -36,7 +36,7 @@ class CommentsState extends State<Comments> {
     this.postOwnerId,
     this.postMediaUrl,
   });
-// stream builder to retrieve comments in realtime from firestore
+
   buildComments() {
     return StreamBuilder(
         stream: commentsRef
