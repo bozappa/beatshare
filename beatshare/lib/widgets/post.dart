@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animator/animator.dart';
+import 'package:beatshare/pages/activity_feed.dart';
 import 'package:beatshare/pages/comments.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -107,7 +108,7 @@ class _PostState extends State<Post> {
             backgroundColor: Colors.grey,
           ),
           title: GestureDetector(
-            onTap: () => print('showing profile'),
+            onTap: () => showProfile(context, profileId: user.id),
             child: Text(
               user.username,
               style: TextStyle(

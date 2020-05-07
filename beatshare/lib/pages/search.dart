@@ -1,4 +1,5 @@
 import 'package:beatshare/models/user.dart';
+import 'package:beatshare/pages/activity_feed.dart';
 import 'package:beatshare/pages/home.dart';
 import 'package:beatshare/widgets/progress.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -120,7 +121,7 @@ class UserResult extends StatelessWidget {
       child: Column(
         children: <Widget>[
           GestureDetector(
-            onTap: () => print('tapped'),
+            onTap: () => showProfile(context, profileId: user.id),
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.grey,
