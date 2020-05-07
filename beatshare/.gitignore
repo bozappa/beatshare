@@ -29,6 +29,9 @@
 .pub/
 /build/
 
+# Key properties file
+key.properties
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
