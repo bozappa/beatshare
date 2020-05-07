@@ -22,14 +22,51 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final String currentUserId = currentUser?.id;
   String postOrientation = "grid";
+  bool isFollowing = false;
   bool isLoading = false;
   int postCount = 0;
+  int followerCount = 0;
+  int followingCount = 0;
   List<Post> posts = [];
 
   @override
   void initState() {
     super.initState();
     getProfilePosts();
+    getFollowers();
+    getFollowing();
+    checkIfFollowing();
+  }
+
+  checkIfFollowing() async {
+    DocumentSnapshot doc = await followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .get();
+    setState(() {
+      isFollowing = doc.exists;
+    });
+  }
+
+  getFollowers() async {
+    QuerySnapshot snapshot = await followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .getDocuments();
+    setState(() {
+      followerCount = snapshot.documents.length;
+    });
+  }
+
+  getFollowing() async {
+    QuerySnapshot snapshot = await followingRef
+        .document(widget.profileId)
+        .collection('userFollowing')
+        .getDocuments();
+    setState(() {
+      followingCount = snapshot.documents.length;
+    });
   }
 
   getProfilePosts() async {
@@ -90,15 +127,15 @@ class _ProfileState extends State<Profile> {
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white,
+              color: isFollowing ? Colors.black : Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: isFollowing ? Colors.white : Colors.blue,
             border: Border.all(
-              color: Colors.blue,
+              color: isFollowing ? Colors.grey : Colors.blue,
             ),
             borderRadius: BorderRadius.circular(5.0),
           ),
@@ -111,89 +148,171 @@ class _ProfileState extends State<Profile> {
     // viewing your own profile - should show edit profile button
     bool isProfileOwner = currentUserId == widget.profileId;
     if (isProfileOwner) {
-      return buildButton(text: "Edit Profile", function: editProfile);
-    } else {
-      return Text('button');
+      return buildButton(
+        text: "Edit Profile",
+        function: editProfile,
+      );
+    } else if (isFollowing) {
+      return buildButton(
+        text: "Unfollow",
+        function: handleUnfollowUser,
+      );
+    } else if (!isFollowing) {
+      return buildButton(
+        text: "Follow",
+        function: handleFollowUser,
+      );
     }
   }
+
+  handleUnfollowUser() {
+    setState(() {
+      isFollowing = false;
+    });
+    // remove follower
+    followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    // remove following
+    followingRef
+        .document(currentUserId)
+        .collection('userFollowing')
+        .document(widget.profileId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+    // delete activity feed item for them
+    activityFeedRef
+        .document(widget.profileId)
+        .collection('feedItems')
+        .document(currentUserId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  handleFollowUser() {
+    setState(() {
+      isFollowing = true;
+    });
+    // Make auth user follower of THAT user (update THEIR followers collection)
+    followersRef
+        .document(widget.profileId)
+        .collection('userFollowers')
+        .document(currentUserId)
+        .setData({});
+    // Put THAT user on YOUR following collection (update your following collection)
+    followingRef
+        .document(currentUserId)
+        .collection('userFollowing')
+        .document(widget.profileId)
+        .setData({});
+    // add activity feed item for that user to notify about new follower (us)
+    activityFeedRef
+        .document(widget.profileId)
+        .collection('feedItems')
+        .document(currentUserId)
+        .setData({
+      "type": "follow",
+      "ownerId": widget.profileId,
+      "username": currentUser.username,
+      "userId": currentUserId,
+      "userProfileImg": currentUser.photoUrl,
+      "timestamp": timestamp,
+    });
+  }
+
 // header for profile
   buildProfileHeader() {
     return FutureBuilder(
-      future: usersRef.document(widget.profileId).get(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return circularProgress();
-        }
- // widget for profile pic
-        User user = User.fromDocument(snapshot.data);
-        return Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 40.0,
-                    backgroundColor: Colors.grey,
-                    backgroundImage: CachedNetworkImageProvider(user.photoUrl),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            buildCountColumn("posts", postCount),
-                            buildCountColumn("followers", 0),
-                            buildCountColumn("following", 0),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            buildProfileButton(),
-                          ],
-                        ),
-                      ],
+        future: usersRef.document(widget.profileId).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return circularProgress();
+          }
+           // widget for profile pic
+          User user = User.fromDocument(snapshot.data);
+          return Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 40.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage:
+                          CachedNetworkImageProvider(user.photoUrl),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              buildCountColumn("posts", postCount),
+                              buildCountColumn("followers", followerCount),
+                              buildCountColumn("following", followingCount),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              buildProfileButton(),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(top: 12.0),
+                  child: Text(
+                    user.username,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
                     ),
                   ),
-                ],
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(top: 12.0),
-                child: Text(
-                  user.username,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    user.displayName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(top: 4.0),
-                child: Text(
-                  user.displayName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(top: 2.0),
+                  child: Text(
+                    user.bio,
                   ),
                 ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(top: 2.0),
-                child: Text(
-                  user.bio,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+              ],
+            ),
+          );
+        });
   }
 
   buildProfilePosts() {
@@ -224,7 +343,6 @@ class _ProfileState extends State<Profile> {
       posts.forEach((post) {
         gridTiles.add(GridTile(child: PostTile(post)));
       });
-      //show grid of posts in profile
       return GridView.count(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
