@@ -65,7 +65,7 @@ class _TimelineState extends State<Timeline> {
   buildUsersToFollow() {
     return StreamBuilder(
       stream:
-          usersRef.orderBy('timestamp', descending: true).limit(30).snapshots(),
+          usersRef.orderBy('timestamp', descending: true).limit(30).snapshots(), // shows latest posts up to 30 users
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();

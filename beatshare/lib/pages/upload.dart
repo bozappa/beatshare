@@ -50,7 +50,7 @@ class _UploadState extends State<Upload>
       this.file = file;
     });
   }
-// image picker here allows different choices for uploading
+
   selectImage(parentContext) {
     return showDialog(
       context: parentContext,
@@ -59,9 +59,9 @@ class _UploadState extends State<Upload>
           title: Text("Create Post"),
           children: <Widget>[
             SimpleDialogOption(
-                child: Text("Camera"), onPressed: handleTakePhoto),
+                child: Text("Photo with Camera"), onPressed: handleTakePhoto),
             SimpleDialogOption(
-                child: Text("Gallery"),
+                child: Text("Image from Gallery"),
                 onPressed: handleChooseFromGallery),
             SimpleDialogOption(
               child: Text("Cancel"),
@@ -110,8 +110,7 @@ class _UploadState extends State<Upload>
   compressImage() async {
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
-    Im.Image imageFile = Im.decodeImage(file.readAsBytesSync());
-    // save files as compressed jpeg
+    Im.Image imageFile = Im.decodeImage(file.readAsBytesSync());     // save files as compressed jpeg
     final compressedImageFile = File('$path/img_$postId.jpg')
       ..writeAsBytesSync(Im.encodeJpg(imageFile, quality: 85));
     setState(() {
