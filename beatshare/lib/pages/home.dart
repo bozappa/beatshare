@@ -9,7 +9,6 @@ import 'package:beatshare/pages/upload.dart';
 import 'package:beatshare/pages/activity_feed.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final usersRef = Firestore.instance.collection('users');
 final DateTime timestamp = DateTime.now();
@@ -81,8 +80,6 @@ class _HomeState extends State<Home> {
     }
 
     currentUser = User.fromDocument(doc);
-    print(currentUser);
-    print(currentUser.username);
   }
 
   @override
@@ -123,7 +120,7 @@ class _HomeState extends State<Home> {
             onPressed: logout,
           ),
           ActivityFeed(),
-          Upload(),
+          Upload(currentUser: currentUser),
           Search(),
           Profile(),
         ],
@@ -194,7 +191,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
