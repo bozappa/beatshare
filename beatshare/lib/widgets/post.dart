@@ -263,6 +263,7 @@ class _PostState extends State<Post> {
       });
     }
   }
+
 // when an image is liked a heart animation will show
   buildPostImage() {
     return GestureDetector(
