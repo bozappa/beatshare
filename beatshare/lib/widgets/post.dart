@@ -35,7 +35,7 @@ class Post extends StatefulWidget {
       likes: doc['likes'],
     );
   }
-// boolean for checking how many likes are on post
+
   int getLikeCount(likes) {
     // if no likes, return 0
     if (likes == null) {
