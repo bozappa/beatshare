@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'BeatShare',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData(       // can call colour theme from other classes
         primarySwatch: Colors.deepPurple,
         accentColor: Colors.teal,
       ),
