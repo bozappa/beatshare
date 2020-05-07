@@ -1,5 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-cachedNetworkImage(mediaUrl) {
-  return Text('cached network image');
+
+// reduce loading times by caching images
+// add a loading spinner
+Widget cachedNetworkImage(String mediaUrl) {
+  return CachedNetworkImage(
+    imageUrl: mediaUrl,
+    fit: BoxFit.cover,
+    placeholder: (context, url) => Padding(
+      child: CircularProgressIndicator(),
+      padding: EdgeInsets.all(20.0),
+    ),
+    // display error if cannot show image
+    errorWidget: (context, url, error) => Icon(Icons.error),
+  );
 }
